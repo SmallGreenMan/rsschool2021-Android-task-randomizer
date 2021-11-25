@@ -1,17 +1,27 @@
 package com.rsschool.android2021
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import kotlin.random.Random
 
-class SecondFragment : Fragment() {
+class SecondFragment : Fragment(com.rsschool.android2021.R.layout.fragment_second), OnBackPressedListener {
+
+    private var listener: SecondFragment.BackButtonListener? = null
 
     private var backButton: Button? = null
     private var result: TextView? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        listener = context as SecondFragment.BackButtonListener
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,12 +43,19 @@ class SecondFragment : Fragment() {
 
         backButton?.setOnClickListener {
             // TODO: implement back
+            backButtonAction ()
         }
+    }
+    override fun onBackPressed() {
+        backButtonAction ()
+    }
+    fun backButtonAction () {
+        listener?.onBackButtonListener(result?.text.toString().toInt())
     }
 
     private fun generate(min: Int, max: Int): Int {
         // TODO: generate random number
-        return 0
+        return Random.nextInt(min, max)
     }
 
     companion object {
@@ -50,10 +67,19 @@ class SecondFragment : Fragment() {
 
             // TODO: implement adding arguments
 
-            return fragment
+            return SecondFragment().apply {
+                arguments = bundleOf(
+                    MIN_VALUE_KEY to min,
+                    MAX_VALUE_KEY to max
+                )
+            }
         }
 
         private const val MIN_VALUE_KEY = "MIN_VALUE"
         private const val MAX_VALUE_KEY = "MAX_VALUE"
+    }
+
+    interface BackButtonListener {
+        fun onBackButtonListener(result: Int)
     }
 }
